@@ -44,15 +44,5 @@ def getDuplicates(listOfTemples):
     return results
 
 if __name__ == "__main__":
-    URLs = getWikipediaThaiTemples(provinces)
-    for idx, URL in enumerate(URLs):
-        temples = getTempleNames(URL)
-        # print(temples)
-
-        with open(f'{provinces[idx]}.csv', 'w', encoding='UTF8') as f:
-            f.write('ชื่อวัด\n')
-            for temple in temples:
-                f.write(f'{temple}\n')
-
-
-
+    URLs = getWikipediaThaiTemples(['พัทลุง'])
+    temples = getTempleNames(URLs[0])

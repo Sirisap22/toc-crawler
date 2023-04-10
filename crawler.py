@@ -38,7 +38,7 @@ class TemplesCrawler:
         reg = r'<li>.*(?:วัด|สำนัก).*?<(?=[\s\S]*รายชื่อวัดในประเทศไทยแบ่งตามจังหวัด)'  
         finds = re.findall(reg, HTML)
 
-        pattern = r'[\u0E00-\u0E7F]+'
+        pattern = r"[\u0E00-\u0E7F]+[-\s\d]*(?!ตำบล)[\u0E00-\u0E7F]*"
         matches = []
         for find in finds:
             matches.append(re.findall(pattern, find)[0])
