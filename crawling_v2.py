@@ -6,7 +6,7 @@ provinces = ['พังงา', 'พัทลุง', 'พิจิตร', 'พ
 
 def getWikipediaThaiTemples(provinces):
     baseURL = 'https://th.wikipedia.org'
-    response = requests.get(f'{baseURL}/wiki/%E0%B8%AB%E0%B8%A1%E0%B8%A7%E0%B8%94%E0%B8%AB%E0%B8%A1%E0%B8%B9%E0%B9%88:%E0%B8%A3%E0%B8%B2%E0%B8%A2%E0%B8%8A%E0%B8%B7%E0%B9%88%E0%B8%AD%E0%B8%A7%E0%B8%B1%E0%B8%94%E0%B9%84%E0%B8%97%E0%B8%A2')
+    response = requests.get(f'{baseURL}https://th.wikipedia.org/wiki/หมวดหมู่:รายชื่อวัดไทย')
 
     # get all province links
     links = []
@@ -32,7 +32,7 @@ def getTempleNames(URL):
     
     if matches[-1] == 'วัดไทย': # เอาตรงเพิ่มเติมออก
         matches.pop()
-    return list(dict.fromkeys(matches)) # remove duplicates
+    return list(dict.fromkeys(list(map(lambda x: x.strip(), matches)))) # remove duplicates
 
 def getDuplicates(listOfTemples):
     from collections import Counter

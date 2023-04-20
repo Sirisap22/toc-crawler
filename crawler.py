@@ -5,14 +5,14 @@ class TemplesCrawler:
     
     def __init__(self):
         self.baseURL = 'https://th.wikipedia.org'
-        self.indexPage = requests.get(f'{self.baseURL}/wiki/%E0%B8%AB%E0%B8%A1%E0%B8%A7%E0%B8%94%E0%B8%AB%E0%B8%A1%E0%B8%B9%E0%B9%88:%E0%B8%A3%E0%B8%B2%E0%B8%A2%E0%B8%8A%E0%B8%B7%E0%B9%88%E0%B8%AD%E0%B8%A7%E0%B8%B1%E0%B8%94%E0%B9%84%E0%B8%97%E0%B8%A2').text
+        self.indexPage = requests.get(f'{self.baseURL}/wiki/หมวดหมู่:รายชื่อวัดไทย').text
         self.provinces = ['พังงา', 'พัทลุง', 'พิจิตร', 'พิษณุโลก', 'อุบลราชธานี']
         self.temples = {}
         self.initTemplesByProvinces()
     
     def initTemplesByProvinces(self):
-        for province in self.provinces:
-            URL = self.getWikipediaThaiTemplesLink(province)
+        URLs = self.getWikipediaThaiTemplesLinks()
+        for URL, province in zip(URLs, self.provinces):
             temples = self.getTempleNames(URL)
             self.temples[province] = temples
         
@@ -26,26 +26,26 @@ class TemplesCrawler:
                 f.write(f'{temple}\n')
         
 
-    def getWikipediaThaiTemplesLink(self, province):
-        reg = r'<a href="(.*?)" title="รายชื่อวัดในจังหวัด' + f'{province}">'
-        match = re.findall(reg, self.indexPage)
-        link = match[0]
+    def getWikipediaThaiTemplesLinks(self):
+        reg = r'<a href="(.*?)" title="รายชื่อวัดในจังหวัด(พังงา|พัทลุง|พิจิตร|พิษณุโลก|อุบลราชธานี)">'
+        matches = re.findall(reg, self.indexPage)
+        links = list(map(lambda match: f"{self.baseURL}{match[0]}", matches))
 
-        return f"{self.baseURL}{link}"
+        return links
     
     def getTempleNames(self, URL):
         HTML = requests.get(URL).text
         reg = r'<li>.*(?:วัด|สำนัก).*?<(?=[\s\S]*รายชื่อวัดในประเทศไทยแบ่งตามจังหวัด)'  
         finds = re.findall(reg, HTML)
 
-        pattern = r"[\u0E00-\u0E7F]+[-\s\d]*(?!ตำบล)[\u0E00-\u0E7F]*"
+        pattern = r'[\u0E00-\u0E7F]+[-\s\d]*(?!ตำบล)[\u0E00-\u0E7F]*'
         matches = []
         for find in finds:
             matches.append(re.findall(pattern, find)[0])
         
         if matches[-1] == 'วัดไทย': # เอาตรงเพิ่มเติมออก
             matches.pop()
-        return list(dict.fromkeys(matches)) # remove duplicates
+        return list(dict.fromkeys(list(map(lambda x: x.strip(), matches)))) # remove duplicates
 
 if __name__ == "__main__":
     crawler = TemplesCrawler()
